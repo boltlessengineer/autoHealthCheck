@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 
 	checker "github.com/seongmin8452/2020/autoHealthCheck/autoChecker"
 	profile "github.com/seongmin8452/2020/autoHealthCheck/readProfile"
@@ -20,6 +18,7 @@ func main() {
 	fmt.Println(rtnMsg)
 	fmt.Println("------------------------------------")
 	fmt.Println("done.")
-	fmt.Println("\n[ Press 'Enter' to exit ]")
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
+	fmt.Println("\n[ Press any key to exit ]")
+	var input string
+	fmt.Scan(&input)
 }
