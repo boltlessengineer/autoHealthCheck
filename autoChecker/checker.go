@@ -26,16 +26,16 @@ type ResponseFrom12 struct {
 
 // AutoCheck automatically checks student-health-check
 func Autocheck(user *profile.Student) string {
+
+	qstnCrtfcNoEncpt, rtnRsltCode := Authorizaton(user)
+
 	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co02_000.do"
-	qstnCrtfcNoEncpt, rtnRsltCode := getSVO(user)
 
 	res, err := http.PostForm(baseURL, url.Values{
-		"qstnCrtfcNoEncpt": {qstnCrtfcNoEncpt},
 		"rtnRsltCode":      {rtnRsltCode},
+		"qstnCrtfcNoEncpt": {qstnCrtfcNoEncpt},
 		"schulNm":          {user.School},
-		"pName":            {user.Name},
-		"frnoRidno":        {user.Birth},
-		"schulCode":        {user.SchoolCode},
+		"stdntName":        {user.Name},
 		"rspns01":          {"1"},
 		"rspns02":          {"1"},
 		"rspns07":          {"0"},
@@ -47,14 +47,14 @@ func Autocheck(user *profile.Student) string {
 
 	body, err := ioutil.ReadAll(res.Body)
 	checkErr(err)
-	//fmt.Println(string(body))
+	fmt.Println(string(body))
 
 	defer res.Body.Close()
 
 	s1 := strings.Split(string(body), "<P style=\"margin:5rem auto; line-height:3rem; text-align:center;\">")[1]
 	content_text := strings.Trim(strings.Split(s1, "</p>")[0], " ")
 	textLines := strings.Split(content_text, "<br>")
-	textLines[0] = strings.TrimSpace(textLines[0])[6:]
+	textLines[0] = strings.Replace(strings.TrimSpace(textLines[0]), "&nbsp;", "\n", 1)
 	textLines[1] = strings.Replace(strings.TrimSpace(textLines[1]), "<br/>", "\n", 1)
 
 	rtnMsg := strings.Join(textLines[:], "\n")
@@ -62,20 +62,21 @@ func Autocheck(user *profile.Student) string {
 	return rtnMsg
 }
 
-func getSVO(user *profile.Student) (string, string) {
+func Authorizaton(user *profile.Student) (string, string) {
 	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co00_012.do"
 
 	res, err := http.PostForm(baseURL, url.Values{
+		"schulCode": {user.SchoolCode},
 		"schulNm":   {user.School},
 		"pName":     {user.Name},
 		"frnoRidno": {user.Birth},
-		"schulCode": {user.SchoolCode},
 	})
 	checkErr(err)
 	checkCode(res)
 
 	body, err := ioutil.ReadAll(res.Body)
 	checkErr(err)
+	fmt.Println(string(body))
 
 	defer res.Body.Close()
 
@@ -84,8 +85,9 @@ func getSVO(user *profile.Student) (string, string) {
 	RtnRsltCode := data.ResultSVO.RtnRsltCode
 	QstnCrtfcNoEncpt := data.ResultSVO.QstnCrtfcNoEncpt
 	fmt.Println(QstnCrtfcNoEncpt)
+	fmt.Println(RtnRsltCode)
 
-	return QstnCrtfcNoEncpt, RtnRsltCode
+	return RtnRsltCode, QstnCrtfcNoEncpt
 }
 
 func getRtnMsg(resBody io.Reader) string {
