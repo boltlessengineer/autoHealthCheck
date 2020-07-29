@@ -1,9 +1,0 @@
-POST https://eduro.goe.go.kr/stv_cvd_co00_012.do
-Content-Type: application/x-www-form-urlencoded; charset=UTF-8
-
-{
-    "schulCode": "J100005836",
-    "schulNm": "보평고등학교",
-    "pName": "이성민",
-    "frnoRidno": "030801",
-}
