@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	usr := profile.ReadProfile("./profile/profile.json")
+	usr := profile.ReadProfile("profile.json")
 	fmt.Println("user name   :", usr.Name)
 	fmt.Println("user birth  :", usr.Birth)
 	fmt.Println("user shcool :", usr.School)
