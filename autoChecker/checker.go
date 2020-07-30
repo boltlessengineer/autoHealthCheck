@@ -18,6 +18,8 @@ import (
 type ResultSVO struct {
 	RtnRsltCode      string
 	QstnCrtfcNoEncpt string
+	SchulNm          string
+	StdntName        string
 }
 
 type ResponseFrom12 struct {
@@ -27,15 +29,17 @@ type ResponseFrom12 struct {
 // AutoCheck automatically checks student-health-check
 func Autocheck(user *profile.Student) string {
 
-	qstnCrtfcNoEncpt, rtnRsltCode := Authorizaton(user)
+	qstn, rtnCode := Authorizaton(user)
+
+	rtnCode, schulNm, stdntName := requestNames(qstn, rtnCode)
 
 	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co02_000.do"
 
 	res, err := http.PostForm(baseURL, url.Values{
-		"rtnRsltCode":      {rtnRsltCode},
-		"qstnCrtfcNoEncpt": {qstnCrtfcNoEncpt},
-		"schulNm":          {user.School},
-		"stdntName":        {user.Name},
+		"rtnRsltCode":      {rtnCode},
+		"qstnCrtfcNoEncpt": {qstn},
+		"schulNm":          {schulNm},
+		"stdntName":        {stdntName},
 		"rspns01":          {"1"},
 		"rspns02":          {"1"},
 		"rspns07":          {"0"},
@@ -84,10 +88,49 @@ func Authorizaton(user *profile.Student) (string, string) {
 	json.Unmarshal(body, &data)
 	RtnRsltCode := data.ResultSVO.RtnRsltCode
 	QstnCrtfcNoEncpt := data.ResultSVO.QstnCrtfcNoEncpt
+	fmt.Println("Response from :", baseURL)
 	fmt.Println(QstnCrtfcNoEncpt)
 	fmt.Println(RtnRsltCode)
+	fmt.Println("---")
 
 	return RtnRsltCode, QstnCrtfcNoEncpt
+}
+
+func requestNames(rtnCode string, qstn string) (string, string, string) {
+	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co01_000.do"
+
+	res, err := http.PostForm(baseURL, url.Values{
+		"rtnRsltCode":      {rtnCode},
+		"qstnCrtfcNoEncpt": {qstn},
+		"schulNm":          {""},
+		"stdntName":        {""},
+		"rspns01":          {"1"},
+		"rspns02":          {"1"},
+		"rspns07":          {"0"},
+		"rspns08":          {"0"},
+		"rspns09":          {"0"},
+	})
+	checkErr(err)
+	checkCode(res)
+
+	body, err := ioutil.ReadAll(res.Body)
+	checkErr(err)
+	fmt.Println(string(body))
+
+	defer res.Body.Close()
+
+	data := new(ResponseFrom12)
+	json.Unmarshal(body, &data)
+	RtnRsltCode := data.ResultSVO.RtnRsltCode
+	SchulNm := data.ResultSVO.SchulNm
+	StdntName := data.ResultSVO.StdntName
+	fmt.Println("Response from :", baseURL)
+	fmt.Println(RtnRsltCode)
+	fmt.Println(SchulNm)
+	fmt.Println(StdntName)
+	fmt.Println("---")
+
+	return RtnRsltCode, SchulNm, StdntName
 }
 
 func getRtnMsg(resBody io.Reader) string {
