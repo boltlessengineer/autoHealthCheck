@@ -6,6 +6,9 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
+
+	"github.com/seongmin8452/2020/autoHealthCheck/srchSchool"
 )
 
 type Profile struct {
@@ -21,7 +24,7 @@ type Student struct {
 
 func ReadProfile(filePath string) *Student {
 	if !fileExists(filePath) {
-		fmt.Println("Profile.json file doesn't exists")
+		fmt.Println("[!] Profile.json file doesn't exists")
 		makeUsrProfile(filePath)
 	}
 	file, _ := ioutil.ReadFile(filePath)
@@ -43,14 +46,35 @@ func fileExists(filePath string) bool {
 }
 
 func makeUsrProfile(filePath string) {
-	var name, birth string
-	fmt.Printf("학생 이름 입력                   : ")
+	var name, birth, prevSchoolNm, schoolNm, schoolCode string
+	fmt.Println("------------------------------------------------")
+	fmt.Printf("학생 이름 입력                     : ")
 	fmt.Scan(&name)
-	fmt.Printf("생년월일(주민번호 첫 6자리) 입력 : ")
+	fmt.Printf("생년월일(주민번호 첫 6자리) 입력   : ")
 	fmt.Scan(&birth)
-	defaultProfile := []byte("{\n    \"student\": {\n        \"name\": \"" + name + "\",\n        \"birth\": \"" + birth + "\",\n        \"school\": \"보평고등학교\",\n        \"schoolcode\": \"J100005836\"\n    }\n}\n")
 
-	//err := ioutil.WriteFile(filePath, defaultProfile, 0644)
+	// /*
+	for {
+		var usrSelect string = "y"
+		fmt.Printf("학교 이름 입력                     : ")
+		fmt.Scan(&prevSchoolNm)
+		_, schoolCode, schoolNm = srchSchool.SrchSchool(prevSchoolNm)
+		if prevSchoolNm != schoolNm {
+			fmt.Println("학교명이 입력한 것과 다릅니다.")
+			fmt.Printf(schoolNm)
+			fmt.Printf("(이)가 맞습니까? (Y/n) : ")
+			fmt.Scan(&usrSelect)
+			if strings.ToLower(usrSelect) == "y" {
+				break
+			}
+		} else {
+			break
+		}
+	}
+	// */
+
+	defaultProfile := []byte("{\n    \"student\": {\n        \"name\": \"" + name + "\",\n        \"birth\": \"" + birth + "\",\n        \"school\": \"" + schoolNm + "\",\n        \"schoolcode\": \"" + schoolCode + "\"\n    }\n}\n")
+
 	f, err := os.Create(filePath)
 	if err != nil {
 		log.Fatalln(err)

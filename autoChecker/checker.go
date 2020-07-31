@@ -22,7 +22,7 @@ type ResultSVO struct {
 	StdntName        string
 }
 
-type ResponseFrom12 struct {
+type ResponseTemplate struct {
 	ResultSVO ResultSVO
 }
 
@@ -51,7 +51,7 @@ func Autocheck(user *profile.Student) string {
 
 	body, err := ioutil.ReadAll(res.Body)
 	checkErr(err)
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	defer res.Body.Close()
 
@@ -80,18 +80,18 @@ func Authorizaton(user *profile.Student) (string, string) {
 
 	body, err := ioutil.ReadAll(res.Body)
 	checkErr(err)
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	defer res.Body.Close()
 
-	data := new(ResponseFrom12)
+	data := new(ResponseTemplate)
 	json.Unmarshal(body, &data)
 	RtnRsltCode := data.ResultSVO.RtnRsltCode
 	QstnCrtfcNoEncpt := data.ResultSVO.QstnCrtfcNoEncpt
 	fmt.Println("Response from :", baseURL)
 	fmt.Println(QstnCrtfcNoEncpt)
 	fmt.Println(RtnRsltCode)
-	fmt.Println("---")
+	fmt.Println("------------------------------------------------")
 
 	return RtnRsltCode, QstnCrtfcNoEncpt
 }
@@ -115,11 +115,11 @@ func requestNames(rtnCode string, qstn string) (string, string, string) {
 
 	body, err := ioutil.ReadAll(res.Body)
 	checkErr(err)
-	fmt.Println(string(body))
+	// fmt.Println(string(body))
 
 	defer res.Body.Close()
 
-	data := new(ResponseFrom12)
+	data := new(ResponseTemplate)
 	json.Unmarshal(body, &data)
 	RtnRsltCode := data.ResultSVO.RtnRsltCode
 	SchulNm := data.ResultSVO.SchulNm
@@ -128,7 +128,7 @@ func requestNames(rtnCode string, qstn string) (string, string, string) {
 	fmt.Println(RtnRsltCode)
 	fmt.Println(SchulNm)
 	fmt.Println(StdntName)
-	fmt.Println("---")
+	fmt.Println("------------------------------------------------")
 
 	return RtnRsltCode, SchulNm, StdntName
 }
