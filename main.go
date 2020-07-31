@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	fmt.Println("-------Auto Student Health Checker v0.9.2-------")
 	usr := profile.ReadProfile("profile.json")
 	fmt.Println("------------------------------------------------")
 	fmt.Println("user name   :", usr.Name)
