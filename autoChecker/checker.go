@@ -1,149 +1,24 @@
 package checker
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
-	"strings"
 
-	"github.com/PuerkitoBio/goquery"
-	profile "github.com/seongmin8452/2020/autoHealthCheck/readProfile"
+	selfcheck "github.com/gangjun06/auto-selfcheck"
 )
 
-// Json response Struct from 012.do
-type ResultSVO struct {
-	RtnRsltCode      string
-	QstnCrtfcNoEncpt string
-	SchulNm          string
-	StdntName        string
-}
-
-type ResponseTemplate struct {
-	ResultSVO ResultSVO
-}
-
-// AutoCheck automatically checks student-health-check
-func Autocheck(user *profile.Student) string {
-
-	qstn, rtnCode := Authorizaton(user)
-
-	rtnCode, schulNm, stdntName := requestNames(qstn, rtnCode)
-
-	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co02_000.do"
-
-	res, err := http.PostForm(baseURL, url.Values{
-		"rtnRsltCode":      {rtnCode},
-		"qstnCrtfcNoEncpt": {qstn},
-		"schulNm":          {schulNm},
-		"stdntName":        {stdntName},
-		"rspns01":          {"1"},
-		"rspns02":          {"1"},
-		"rspns07":          {"0"},
-		"rspns08":          {"0"},
-		"rspns09":          {"0"},
-	})
+func Autocheck() string {
+	orgCode, err := selfcheck.FindSchool("보평고등학교", 9, 4)
 	checkErr(err)
-	checkCode(res)
+	fmt.Println(orgCode)
 
-	body, err := ioutil.ReadAll(res.Body)
+	info, err := selfcheck.GetStudnetInfo(9, orgCode, "이성민", "030801")
 	checkErr(err)
-	// fmt.Println(string(body))
 
-	defer res.Body.Close()
-
-	s1 := strings.Split(string(body), "<P style=\"margin:5rem auto; line-height:3rem; text-align:center;\">")[1]
-	content_text := strings.Trim(strings.Split(s1, "</p>")[0], " ")
-	textLines := strings.Split(content_text, "<br>")
-	textLines[0] = strings.Replace(strings.TrimSpace(textLines[0]), "&nbsp;", "\n", 1)
-	textLines[1] = strings.Replace(strings.TrimSpace(textLines[1]), "<br/>", "\n", 1)
-
-	rtnMsg := strings.Join(textLines[:], "\n")
-
-	return rtnMsg
-}
-
-func Authorizaton(user *profile.Student) (string, string) {
-	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co00_012.do"
-
-	res, err := http.PostForm(baseURL, url.Values{
-		"schulCode": {user.SchoolCode},
-		"schulNm":   {user.School},
-		"pName":     {user.Name},
-		"frnoRidno": {user.Birth},
-	})
+	err = info.AllHealthy()
 	checkErr(err)
-	checkCode(res)
-
-	body, err := ioutil.ReadAll(res.Body)
-	checkErr(err)
-	// fmt.Println(string(body))
-
-	defer res.Body.Close()
-
-	data := new(ResponseTemplate)
-	json.Unmarshal(body, &data)
-	RtnRsltCode := data.ResultSVO.RtnRsltCode
-	QstnCrtfcNoEncpt := data.ResultSVO.QstnCrtfcNoEncpt
-	fmt.Println("Response from :", baseURL)
-	fmt.Println(QstnCrtfcNoEncpt)
-	fmt.Println(RtnRsltCode)
-	fmt.Println("------------------------------------------------")
-
-	return RtnRsltCode, QstnCrtfcNoEncpt
-}
-
-func requestNames(rtnCode string, qstn string) (string, string, string) {
-	var baseURL string = "https://eduro.goe.go.kr/stv_cvd_co01_000.do"
-
-	res, err := http.PostForm(baseURL, url.Values{
-		"rtnRsltCode":      {rtnCode},
-		"qstnCrtfcNoEncpt": {qstn},
-		"schulNm":          {""},
-		"stdntName":        {""},
-		"rspns01":          {"1"},
-		"rspns02":          {"1"},
-		"rspns07":          {"0"},
-		"rspns08":          {"0"},
-		"rspns09":          {"0"},
-	})
-	checkErr(err)
-	checkCode(res)
-
-	body, err := ioutil.ReadAll(res.Body)
-	checkErr(err)
-	// fmt.Println(string(body))
-
-	defer res.Body.Close()
-
-	data := new(ResponseTemplate)
-	json.Unmarshal(body, &data)
-	RtnRsltCode := data.ResultSVO.RtnRsltCode
-	SchulNm := data.ResultSVO.SchulNm
-	StdntName := data.ResultSVO.StdntName
-	fmt.Println("Response from :", baseURL)
-	fmt.Println(RtnRsltCode)
-	fmt.Println(SchulNm)
-	fmt.Println(StdntName)
-	fmt.Println("------------------------------------------------")
-
-	return RtnRsltCode, SchulNm, StdntName
-}
-
-func getRtnMsg(resBody io.Reader) string {
-	doc, err := goquery.NewDocumentFromReader(resBody)
-	checkErr(err)
-	_, b := doc.Attr(".content_box")
-	if !b {
-		fmt.Println(doc.Text())
-	}
-
-	content_box := doc.Find(".content_box").Text()
-
-	return content_box
+	return "asdgho"
 }
 
 func checkErr(err error) {
