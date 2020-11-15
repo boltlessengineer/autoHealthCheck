@@ -21,6 +21,8 @@ func Autocheck(s Stdnt) string {
 
 func checkErr(err error) {
 	if err != nil {
+		fmt.Println("================= Error ===================")
 		fmt.Println(err)
+		fmt.Println("===========================================")
 	}
 }
