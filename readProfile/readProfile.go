@@ -33,16 +33,10 @@ func ReadCsv(filePath string) []Stdnt {
 		level := findLevelNum(row[8])
 		schNm := row[9]
 
-		fmt.Printf("%s %s %d %d %s \n", name, birth, area, level, schNm)
+		fmt.Printf("%s %d %d %s \n", name, area, level, schNm)
 
 		stdnt := Stdnt{name, birth, area, level, schNm}
 		stdnts = append(stdnts, stdnt)
-		
-		for j := 5; j < 10; j++ {
-			fmt.Printf("%s ", row[j])
-		}
-
-		fmt.Println()
 	}
 
 	return stdnts
