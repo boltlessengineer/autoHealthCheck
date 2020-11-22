@@ -27,22 +27,25 @@ func ReadCsv(filePath string) []Stdnt {
 	stdnts := make([]Stdnt, 0)
 
 	for _, row := range rows[1:] {
-		name := row[5]
-		birth := row[6]
-		area := findAreaNum(row[7])
-		level := findLevelNum(row[8])
-		schNm := row[9]
+		name := row[0]
+		birth := row[1]
+		area := findAreaNum(row[2])
+		level := findLevelNum(row[3])
+		schNm := row[4]
 
-		fmt.Printf("%s %s %d %d %s \n", name, birth, area, level, schNm)
+		fmt.Printf("%s %d %d %s \n", name, area, level, schNm)
 
 		stdnt := Stdnt{name, birth, area, level, schNm}
 		stdnts = append(stdnts, stdnt)
+<<<<<<< HEAD
 		
-		for j := 5; j < 10; j++ {
+		for j := 0; j < 5; j++ {
 			fmt.Printf("%s ", row[j])
 		}
 
 		fmt.Println()
+=======
+>>>>>>> 56c46346f76fc70e6bbca47170c59b8f3cbe8e9f
 	}
 
 	return stdnts
