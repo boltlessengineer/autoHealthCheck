@@ -37,15 +37,6 @@ func ReadCsv(filePath string) []Stdnt {
 
 		stdnt := Stdnt{name, birth, area, level, schNm}
 		stdnts = append(stdnts, stdnt)
-<<<<<<< HEAD
-		
-		for j := 0; j < 5; j++ {
-			fmt.Printf("%s ", row[j])
-		}
-
-		fmt.Println()
-=======
->>>>>>> 56c46346f76fc70e6bbca47170c59b8f3cbe8e9f
 	}
 
 	return stdnts
