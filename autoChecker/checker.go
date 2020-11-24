@@ -11,7 +11,7 @@ func Autocheck(s Stdnt) string {
 	orgCode, err := FindSchool(s.SchNm, s.Area, s.Level)
 	checkErr(err)
 
-	info, err := GetStudnetInfo(9, orgCode, s.Name, s.Birth)
+	info, err := GetStudnetInfo(s.Area, orgCode, s.Name, s.Birth)
 	checkErr(err)
 
 	err = info.AllHealthy()
